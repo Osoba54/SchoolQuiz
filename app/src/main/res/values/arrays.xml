@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="europe">
+        <item>Albania</item>
+        <item>Andora</item>
+        <item>Austria</item>
+        <item>Belgia</item>
+        <item>Bułgaria</item>
+        <item>Chorwacja</item>
+        <item>Czechy</item>
+        <item>Dania</item>
+        <item>Estonia</item>
+        <item>Finlandia</item>
+        <item>Francja</item>
+        <item>Grecja</item>
+        <item>Gruzja</item>
+        <item>Hiszpania</item>
+        <item>Irlandia</item>
+        <item>Islandia</item>
+        <item>Liechtenstein</item>
+        <item>Litwa</item>
+        <item>Luksemburg</item>
+        <item>Łotwa</item>
+        <item>Macedonia Północna</item>
+        <item>Malta</item>
+        <item>Mołdawia</item>
+        <item>Monako</item>
+        <item>Czarnogóra</item>
+        <item>Niemcy</item>
+        <item>Norwegia</item>
+        <item>Polska</item>
+        <item>Portugalia</item>
+        <item>Słowacja</item>
+        <item>Słowenia</item>
+        <item>Szwajcaria</item>
+        <item>Szwecja</item>
+        <item>Węgry</item>
+        <item>Włochy</item>
+        <item>Turcja</item>
+    </string-array>
+</resources>
