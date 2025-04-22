@@ -14,10 +14,9 @@ import android.view.animation.DecelerateInterpolator;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
+import com.example.myquiz.MainActivity;
 import com.example.myquiz.R;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Effect {
 
@@ -44,7 +43,7 @@ public class Effect {
 
 
         audioAttributes = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                .setUsage(AudioAttributes.USAGE_MEDIA)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .build();
 
@@ -71,15 +70,14 @@ public class Effect {
         this.showBlinkEffect(ifRight,800);
     }
 
-    public boolean showSummary(int points,int rounds){
-        AtomicBoolean ifAgain = new AtomicBoolean(false);
+    public void showSummary(int points, int rounds, MainActivity act){
         new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_App_MaterialAlertDialog)
-                .setTitle("Zdobyłeś "+ points +"/" + rounds)
-                .setPositiveButton("Zagraj ponownie", (d,w) -> ifAgain.set(true))
-                .setNegativeButton("Zamknij aplikację", (d,w) -> activity.finish())
+                .setTitle("Poprawnie "+ points +"/" + rounds)
+                .setPositiveButton("Zagraj ponownie", (d,w) -> act.newGame())
+                .setNegativeButton("Zamknij aplikację", (d,w) -> activity.finishAffinity())
+                .setNeutralButton("Ustawienia", (d,w)-> act.finish())
                 .setCancelable(false)
                 .show();
-        return ifAgain.get();
     }
 
     public void showBlinkEffect(boolean ifRight, int animDuration) {

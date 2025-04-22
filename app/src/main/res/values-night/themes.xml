@@ -6,6 +6,7 @@
         <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>
         <item name="buttonBarPositiveButtonStyle">@style/Widget.App.Button.pos</item>
         <item name="buttonBarNegativeButtonStyle">@style/Widget.App.Button.neg</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.App.Button.neu</item>
         <item name="materialAlertDialogTitlePanelStyle">@style/Title.Panel.Center</item>
         <item name="materialAlertDialogBodyTextStyle">@style/Message.Center</item>
     </style>

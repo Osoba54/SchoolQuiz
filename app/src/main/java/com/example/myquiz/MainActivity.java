@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,26 +15,18 @@ import android.widget.Toast;
 
 import com.example.myquiz.quizPackage.Effect;
 import com.example.myquiz.quizPackage.Question;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-
-    private void shortcutToFunctions(){
-        if(true) return;
-        findViews();
-        newGame();
-        createQuestion();
-        checkIfRightAnswIndx(0);
-        onDestroy();
-    }
-
     private TextView tv1;
     private ImageView imgV;
-    private Button btnA1,btnA2,btnA3,btnA4;
+    private Button btnA1,btnA2,btnA3,btnA4,btnTimesUp;
     private String[] countries = new String[36];
     private int rightIndex;
     private String fromRightIndex;
@@ -40,8 +34,49 @@ public class MainActivity extends AppCompatActivity {
     private int currRound = 0;
     private Effect effectGenerator;
     private int numOfQuestions = 35;
-//    TO DO: Sprawdzic jak sie zachowa gdy out of range przy zmianie orientacji ekranu
+    private TextView textViewTimer;
+    private boolean soundOn;
+    private CountDownTimer countDownTimer;
+    private long standardTime;
+    private long timeLeft = 5000;
+    private boolean timerOn;
+    private void startCountdown(){
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+            timeLeft = standardTime;
+        }
 
+        countDownTimer = new CountDownTimer(timeLeft, 100) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timeLeft = millisUntilFinished;
+                String timeFormatted = String.format(Locale.getDefault(), "%.1f", timeLeft / 1000.0);
+                textViewTimer.setText(timeFormatted + "s");
+            }
+
+            @Override
+            public void onFinish() {
+                timeLeft = 0;
+                String timeFormatted = String.format(Locale.getDefault(), "%.1f", timeLeft / 1000.0);
+                textViewTimer.setText(timeFormatted + "s");
+                btnA1.setVisibility(TextView.GONE);
+                btnA2.setVisibility(TextView.GONE);
+                btnA3.setVisibility(TextView.GONE);
+                btnA4.setVisibility(TextView.GONE);
+                btnTimesUp.setVisibility(TextView.VISIBLE);
+                btnTimesUp.setText(fromRightIndex+"\n(0 pkt)");
+                btnTimesUp.setOnClickListener(v->{
+                    btnA1.setVisibility(TextView.VISIBLE);
+                    btnA2.setVisibility(TextView.VISIBLE);
+                    btnA3.setVisibility(TextView.VISIBLE);
+                    btnA4.setVisibility(TextView.VISIBLE);
+                    btnTimesUp.setVisibility(TextView.GONE);
+                    createQuestion();
+                    tv1.setText(points+"/"+(currRound-1));
+                });
+            }
+        }.start();
+    }
 
     private void findViews(){
         tv1 = findViewById(R.id.textView2);
@@ -50,14 +85,19 @@ public class MainActivity extends AppCompatActivity {
         btnA2 = findViewById(R.id.button2);
         btnA3 = findViewById(R.id.button3);
         btnA4 = findViewById(R.id.button4);
+        textViewTimer = findViewById(R.id.textViewTimer);
         countries = getResources().getStringArray(R.array.europe);
         Collections.shuffle(setOfQuests);
         effectGenerator = new Effect(this);
-
+        numOfQuestions = getIntent().getIntExtra("round_len",5);
+        soundOn = getIntent().getBooleanExtra("sound_cb",false);
+        standardTime = getIntent().getIntExtra("stand_time",5) * 1000L;
+        timerOn = getIntent().getBooleanExtra("timer_cb",false);
+        btnTimesUp = findViewById(R.id.buttonTimerFinish);
+        timeLeft = standardTime + 300L;
     }
 
-    private void newGame(){
-        Log.d("lg","NOWA GRA");
+    public void newGame(){
         points = 0;
         currRound = 0;
         tv1.setText("0/0");
@@ -100,13 +140,25 @@ public class MainActivity extends AppCompatActivity {
                 new Question("Turcja", R.drawable.turcja)));
         Collections.shuffle(setOfQuests);
         createQuestion();
-        currRound = currRound - 1;
+//        currRound = currRound - 1;
+
     }
 
-    private void createQuestion() {
+    public void createQuestion() {
+        btnA1.setVisibility(TextView.VISIBLE);
+        btnA2.setVisibility(TextView.VISIBLE);
+        btnA3.setVisibility(TextView.VISIBLE);
+        btnA4.setVisibility(TextView.VISIBLE);
+        btnTimesUp.setVisibility(TextView.GONE);
+
         if(numOfQuestions == currRound){
-            effectGenerator.showSummary(points,currRound);
-            newGame();
+            effectGenerator.showSummary(points,currRound,this);
+            if (countDownTimer != null) {
+                countDownTimer.cancel();
+                timeLeft = standardTime;
+            }
+        } else {
+            if(timerOn) startCountdown();
         }
 
         String rightAnswer = setOfQuests.get(currRound).getAnswer();
@@ -132,8 +184,6 @@ public class MainActivity extends AppCompatActivity {
 
         Collections.shuffle(Arrays.asList(possibleAns));
 
-        Log.d("lg", possibleAns[0] + " " + possibleAns[1] + " " + possibleAns[2] + " " + possibleAns[3] + " : " + rightAnswer + " : " + rightIndex);
-
         imgV.setImageResource(rightImg);
 
         rightIndex = Arrays.asList(possibleAns).indexOf(rightAnswer);
@@ -144,7 +194,6 @@ public class MainActivity extends AppCompatActivity {
         btnA3.setText(possibleAns[2]);
         btnA4.setText(possibleAns[3]);
 
-
         currRound++;
     }
 
@@ -153,20 +202,21 @@ public class MainActivity extends AppCompatActivity {
     private void checkIfRightAnswIndx(int btnNum){
         if(btnNum==rightIndex){
             effectGenerator.showBlinkEffect(true);
-            effectGenerator.playRightSound();
-//            Toast.makeText(MainActivity.this, "Dobrze",Toast.LENGTH_SHORT).show();
+            if(soundOn) effectGenerator.playRightSound();
             points++;
         } else {
             effectGenerator.showBlinkEffect(false);
-            effectGenerator.playWrongSound();
-            Toast.makeText(MainActivity.this, fromRightIndex,Toast.LENGTH_SHORT).show();
+            if(soundOn) effectGenerator.playWrongSound();
+            Snackbar snackbar = Snackbar.make(findViewById(R.id.activity_main), fromRightIndex, Snackbar.LENGTH_SHORT).setDuration(1500);
+            TextView snackbarView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+            snackbarView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            snackbarView.setTextSize(18);
+            snackbar.show();
         }
-        Log.d("lg",rightIndex + " " + btnNum);
 
         createQuestion();
 
-        tv1.setText("Punkty\n"+points+"/"+(currRound-1));
-
+        tv1.setText(points+"/"+(currRound-1));
     }
 
     ArrayList<Question> setOfQuests = new ArrayList<>(Arrays.asList(
@@ -214,9 +264,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         findViews();
-        createQuestion(); // chyba przesunac do else NULL savedInsStat
-//        prawdopodonie podac do funkcji instancesavestate albo jego czesc
-
+        createQuestion();
 
         btnA1.setOnClickListener(view -> checkIfRightAnswIndx(0));
         btnA2.setOnClickListener(view -> checkIfRightAnswIndx(1));
@@ -231,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
 //            rightIndex = savedInstanceState.getInt("rightIndex_k");
 //            fromRightIndex = savedInstanceState.getString("fromRightIndex_k");
 
-            tv1.setText("Punkty\n"+points+"/"+(currRound-1));
+            tv1.setText(points+"/"+(currRound-1));
         }
     }
 

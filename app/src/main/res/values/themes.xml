@@ -1,13 +1,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Theme.MyQuiz" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="materialButtonStyle">@style/MyButtonStyle</item>
+        <item name="android:windowBackground">#96ADB1</item>
     </style>
     <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>
         <item name="buttonBarPositiveButtonStyle">@style/Widget.App.Button.pos</item>
         <item name="buttonBarNegativeButtonStyle">@style/Widget.App.Button.neg</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.App.Button.neu</item>
         <item name="materialAlertDialogTitlePanelStyle">@style/Title.Panel.Center</item>
         <item name="materialAlertDialogBodyTextStyle">@style/Message.Center</item>
     </style>
-
 </resources>

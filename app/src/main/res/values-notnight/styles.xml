@@ -37,4 +37,10 @@
         <item name="android:layout_gravity">center</item>
     </style>
 
+    <style name="Widget.App.Button.neu" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">#2C1607</item>
+        <item name="android:backgroundTint">#E2A30E</item>
+        <item name="android:layout_gravity">center</item>
+    </style>
+
 </resources>
